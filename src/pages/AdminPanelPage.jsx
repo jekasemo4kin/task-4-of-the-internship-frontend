@@ -24,7 +24,7 @@ const AdminPanelPage = () => {
             }
             return new TextDecoder('utf-8').decode(bytes);
         } catch (e) {
-            console.error("Failed to decode Base64Url:", e);
+            console.error("Failed to decode Base64Url:", e, "Input string:", str);
             return null;
         }
     };
@@ -71,16 +71,24 @@ const AdminPanelPage = () => {
                         const parsedPayload = JSON.parse(decodedPayload);
                         setCurrentUser({
                             id: parsedPayload.id,
-                            username: parsedPayload.username
+                            username: parsedPayload.username || parsedPayload.email || 'User'
                         });
                     } catch (e) {
-                        console.error("Unable to parse token payload:", e);
+                        console.error("Unable to parse token payload:", e, "Decoded payload:", decodedPayload);
+                        toast.error("Invalid token format. Please log in again.");
+                        logout();
                     }
+                } else {
+                    toast.error("Could not decode token. Please log in again.");
+                    logout();
                 }
+            } else {
+                toast.error("Malformed token. Please log in again.");
+                logout();
             }
             fetchUsers();
         }
-    }, [isAuthenticated, navigate, fetchUsers, token]);
+    }, [isAuthenticated, navigate, fetchUsers, token, logout]);
     const handleSelectUser = (userId) => {
         setSelectedUsers(prevSelected => {
             if (prevSelected.includes(userId)) {
