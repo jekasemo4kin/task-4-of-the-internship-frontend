@@ -34,7 +34,7 @@ const AdminPanelPage = () => {
             return;
         }
         try {
-            const response = await fetch('http://localhost:5000/api/users/admin/users', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/admin/users`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -69,9 +69,10 @@ const AdminPanelPage = () => {
                 if (decodedPayload) {
                     try {
                         const parsedPayload = JSON.parse(decodedPayload);
-                        if (parsedPayload && parsedPayload.user) {
-                            setCurrentUser(parsedPayload.user);
-                        }
+                        setCurrentUser({
+                            id: parsedPayload.id,
+                            username: parsedPayload.username
+                        });
                     } catch (e) {
                         console.error("Unable to parse token payload:", e);
                     }
@@ -103,7 +104,7 @@ const AdminPanelPage = () => {
         }
         const userIdsToDelete = selectedUsers;
         try {
-            const response = await fetch('http://localhost:5000/api/users', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -139,7 +140,7 @@ const AdminPanelPage = () => {
         }
         const userIdsToBlock = selectedUsers;
         try {
-            const response = await fetch('http://localhost:5000/api/users/status', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ const AdminPanelPage = () => {
         }
         const userIdsToUnblock = selectedUsers;
         try {
-            const response = await fetch('http://localhost:5000/api/users/status', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -200,8 +201,8 @@ const AdminPanelPage = () => {
         }
     };
     const sortedUsers = [...users].sort((a, b) => {
-        const dateA = a.last_login ? new Date(a.last_login).getTime() : 0; // 0 для null
-        const dateB = b.last_login ? new Date(b.last_login).getTime() : 0; // 0 для null
+        const dateA = a.last_login ? new Date(a.last_login).getTime() : 0;
+        const dateB = b.last_login ? new Date(b.last_login).getTime() : 0;
         if (dateA === 0 && dateB !== 0) return 1;
         if (dateA !== 0 && dateB === 0) return -1;
         if (dateA === 0 && dateB === 0) return 0;
@@ -267,12 +268,12 @@ const AdminPanelPage = () => {
                                     className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                                 />
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">ID</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">Username</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">Last login</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">Registration date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Username</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Email</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Last login</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Registration date</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">

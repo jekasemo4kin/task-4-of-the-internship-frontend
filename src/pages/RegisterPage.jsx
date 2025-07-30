@@ -14,7 +14,7 @@ const RegisterPage = () => {
             return;
         }
         try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,8 +30,8 @@ const RegisterPage = () => {
                 toast.error(errorData.message || 'Registration failed. Please try again.');
             }
         } catch (error) {
-            console.error('Login error details:', error);
-            toast.error('An error occurred while logging in. Please try again later.');
+            console.error('Registration error details:', error);
+            toast.error('An error occurred during registration. Please try again later.');
         }
     };
     return (

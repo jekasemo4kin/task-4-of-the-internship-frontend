@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
             const storedToken = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
             if (storedToken) {
                 try {
-                    const response = await fetch('http://localhost:5000/api/auth/verify-token', {
+                    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/verify-token`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${storedToken}`
