@@ -69,10 +69,15 @@ const AdminPanelPage = () => {
                 if (decodedPayload) {
                     try {
                         const parsedPayload = JSON.parse(decodedPayload);
-                        setCurrentUser({
-                            id: parsedPayload.id,
-                            username: parsedPayload.username || parsedPayload.email || 'User'
-                        });
+                        if (parsedPayload.user && parsedPayload.user.username) {
+                            setCurrentUser({
+                                id: parsedPayload.user.id,
+                                username: parsedPayload.user.username
+                            });
+                        } else {
+                            console.warn("Username not found in token payload:", parsedPayload);
+                            setCurrentUser({ id: parsedPayload.id || 'unknown', username: 'User' });
+                        }
                     } catch (e) {
                         console.error("Unable to parse token payload:", e, "Decoded payload:", decodedPayload);
                         toast.error("Invalid token format. Please log in again.");
