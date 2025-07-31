@@ -3,7 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 const AdminPanelPage = () => {
-    const { token, isAuthenticated, logout } = useContext(AuthContext);
+    const { token, isAuthenticated, logout, isLoading: authLoading } = useContext(AuthContext);
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
@@ -29,10 +29,11 @@ const AdminPanelPage = () => {
         }
     };
     const fetchUsers = useCallback(async () => {
-        if (!isAuthenticated || !token) {
+        if (authLoading || !isAuthenticated || !token) {
             setLoading(false);
             return;
         }
+        setLoading(true);
         try {
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/admin/users`, {
                 headers: {
@@ -58,8 +59,11 @@ const AdminPanelPage = () => {
             setError(err.message || 'Unable to load users. Please try again.');
             setLoading(false);
         }
-    }, [isAuthenticated, token, logout]);
+    }, [isAuthenticated, token, logout, authLoading]);
     useEffect(() => {
+        if (authLoading) {
+            return;
+        }
         if (!isAuthenticated) {
             navigate('/login');
         } else {
@@ -76,7 +80,7 @@ const AdminPanelPage = () => {
                             });
                         } else {
                             console.warn("Username not found in token payload:", parsedPayload);
-                            setCurrentUser({ id: parsedPayload.id || 'unknown', username: 'User' });
+                            setCurrentUser({ id: parsedPayload.id || 'unknown', username: 'User' }); // Запасной вариант, если структура токена неожиданная
                         }
                     } catch (e) {
                         console.error("Unable to parse token payload:", e, "Decoded payload:", decodedPayload);
@@ -93,7 +97,7 @@ const AdminPanelPage = () => {
             }
             fetchUsers();
         }
-    }, [isAuthenticated, navigate, fetchUsers, token, logout]);
+    }, [isAuthenticated, navigate, fetchUsers, token, logout, authLoading]);
     const handleSelectUser = (userId) => {
         setSelectedUsers(prevSelected => {
             if (prevSelected.includes(userId)) {
@@ -225,7 +229,7 @@ const AdminPanelPage = () => {
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    if (loading) return <p className="text-gray-700">Loading users...</p>;
+    if (authLoading || loading) return <p className="text-gray-700">Loading...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
     return (
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl mx-auto">
